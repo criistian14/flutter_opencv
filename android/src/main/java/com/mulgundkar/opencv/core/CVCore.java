@@ -1,11 +1,13 @@
 package com.mulgundkar.opencv.core;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -17,9 +19,14 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
+
 import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -148,7 +155,7 @@ public class CVCore {
 
     @SuppressLint("MissingPermission")
     public byte[] boxFilter(byte[] byteData, int outputDepth, ArrayList kernelSize, ArrayList anchorPoint,
-            boolean normalize, int borderType) {
+                            boolean normalize, int borderType) {
         byte[] byteArray = new byte[0];
         try {
             Mat dst = new Mat();
@@ -409,7 +416,7 @@ public class CVCore {
 
     @SuppressLint("MissingPermission")
     public byte[] adaptiveThreshold(byte[] byteData, double maxValue, int adaptiveMethod, int thresholdType,
-            int blockSize, double constantValue) {
+                                    int blockSize, double constantValue) {
         byte[] byteArray = new byte[0];
         try {
             Mat srcGray = new Mat();
@@ -615,7 +622,7 @@ public class CVCore {
 
     @SuppressLint("MissingPermission")
     public byte[] houghLines(byte[] byteData, double rho, double theta, int threshold, double srn, double stn,
-            double minTheta, double maxTheta, String lineColor, int lineThickness, int lineType, int shift) {
+                             double minTheta, double maxTheta, String lineColor, int lineThickness, int lineType, int shift) {
         byte[] byteArray = new byte[0];
         try {
             Mat cdst = new Mat();
@@ -628,7 +635,7 @@ public class CVCore {
             // Standard Hough Line Transform
             Mat lines = new Mat(); // will hold the results of the detection
             Imgproc.HoughLines(src, lines, rho, theta, threshold, srn, stn, minTheta, maxTheta); // runs the actual
-                                                                                                 // detection
+            // detection
             System.out.println("lines: " + lines);
             // Draw the lines
             for (int x = 0; x < lines.rows(); x++) {
@@ -652,7 +659,7 @@ public class CVCore {
 
     @SuppressLint("MissingPermission")
     public byte[] houghLinesProbabilistic(byte[] byteData, double rho, double theta, int threshold,
-            double minLineLength, double maxLineGap, String lineColor, int lineThickness, int lineType, int shift) {
+                                          double minLineLength, double maxLineGap, String lineColor, int lineThickness, int lineType, int shift) {
         byte[] byteArray = new byte[0];
         try {
             Mat cdst = new Mat();
@@ -665,7 +672,7 @@ public class CVCore {
             // Probabilistic Line Transform
             Mat linesP = new Mat(); // will hold the results of the detection
             Imgproc.HoughLinesP(src, linesP, rho, theta, threshold, minLineLength, maxLineGap); // runs the actual
-                                                                                                // detection
+            // detection
             // Draw the lines
             for (int x = 0; x < linesP.rows(); x++) {
                 double[] l = linesP.get(x, 0);
@@ -686,7 +693,7 @@ public class CVCore {
 
     @SuppressLint("MissingPermission")
     public byte[] houghCircles(byte[] byteData, int method, double dp, double minDist, double param1, double param2,
-            int minRadius, int maxRadius, int centerWidth, String centerColor, int circleWidth, String circleColor) {
+                               int minRadius, int maxRadius, int centerWidth, String centerColor, int circleWidth, String circleColor) {
         byte[] byteArray = new byte[0];
         try {
             Mat circles = new Mat();
@@ -729,16 +736,16 @@ public class CVCore {
             // Decode image from input byte array
             List<Double> s = new ArrayList<>();
             List<Double> t = new ArrayList<>();
-            for(int i = 0; i<sourcePoints.size(); i++) {
+            for (int i = 0; i < sourcePoints.size(); i++) {
                 s.add((double) ((Integer) sourcePoints.get(i)));
             }
-            for(int i = 0; i<destinationPoints.size(); i++) {
+            for (int i = 0; i < destinationPoints.size(); i++) {
                 t.add((double) ((Integer) destinationPoints.get(i)));
             }
             Mat input = Imgcodecs.imdecode(new MatOfByte(byteData), Imgcodecs.IMREAD_UNCHANGED);
             MatOfPoint2f src = new MatOfPoint2f(new Point(s.get(0), s.get(1)),
-            new Point(s.get(2), s.get(3)), new Point(s.get(4), s.get(5)),
-            new Point(s.get(6), s.get(7)));
+                    new Point(s.get(2), s.get(3)), new Point(s.get(4), s.get(5)),
+                    new Point(s.get(6), s.get(7)));
             MatOfPoint2f dst = new MatOfPoint2f(new Point(t.get(0), t.get(1)),
                     new Point(t.get(2), t.get(3)), new Point(t.get(4), t.get(5)),
                     new Point(t.get(6), t.get(7)));
@@ -774,9 +781,9 @@ public class CVCore {
 
             Mat source = new Mat(1, 1, CvType.CV_8U, new Scalar(3.0));
             Core.compare(dst, source, dst, Core.CMP_EQ);
-        
+
             Mat foreground2 = new Mat(src.size(), CvType.CV_8UC3, new Scalar(255,
-                    255, 255,255));
+                    255, 255, 255));
             src.copyTo(foreground2, dst);
 
             MatOfByte matOfByte = new MatOfByte();
@@ -793,5 +800,84 @@ public class CVCore {
     public Scalar convertColorToScalar(String color) {
         return new Scalar(Integer.valueOf(color.substring(1, 3), 16), Integer.valueOf(color.substring(3, 5), 16),
                 Integer.valueOf(color.substring(5, 7), 16));
+    }
+
+
+    @SuppressLint("MissingPermission")
+    public List<Map<String, Double>> findContours(byte[] byteData, int mode, int method) {
+        List<Map<String, Double>> contoursFound = new ArrayList<>();
+
+        try {
+            Mat dst = new Mat();
+            // Decode image from input byte array
+            Mat src = Imgcodecs.imdecode(new MatOfByte(byteData), Imgcodecs.IMREAD_UNCHANGED);
+
+            // A list to store all the contours
+            List<MatOfPoint> contours = new ArrayList<>();
+
+            // Find contours operation
+            Imgproc.findContours(src, contours, dst, mode, method);
+
+
+            // Finding biggest rectangle otherwise return original corners
+            double maxArea = dst.height() * dst.width() * 0.5;
+
+            System.out.println("OpenCV height: " + dst.height());
+            System.out.println("OpenCV width: " + dst.width());
+
+
+            Iterator<MatOfPoint> each = contours.iterator();
+            each = contours.iterator();
+            while (each.hasNext()) {
+                MatOfPoint contour = each.next();
+
+//                MatOfPoint2f mMOP2f1 = new MatOfPoint2f();
+//                MatOfPoint2f mMOP2f2 = new MatOfPoint2f();
+//                contour.convertTo(mMOP2f1, CvType.CV_32FC2);
+//
+//                double perimeter = Imgproc.arcLength(mMOP2f1, true);
+//                Imgproc.approxPolyDP(mMOP2f1, mMOP2f2, 0.03 * perimeter, true);
+//                mMOP2f2.convertTo(contour, CvType.CV_32S);
+
+                if (contour.toList().size() >= 4 && maxArea < Imgproc.contourArea(contour) && Imgproc.isContourConvex(contour)) {
+                    maxArea = Imgproc.contourArea(contour);
+                    Map<String, Double> dataTemp = new HashMap<>();
+
+                    for (Point p : contour.toList()) {
+                        dataTemp.put("x", p.x);
+                        dataTemp.put("y", p.y);
+                        dataTemp.put("area", maxArea);
+
+                        dataTemp.put("width", (double) contour.width());
+                        dataTemp.put("height", (double) contour.height());
+                    }
+
+                    contoursFound.add(dataTemp);
+                }
+
+
+//                if (Imgproc.isContourConvex(contour) && maxArea < Imgproc.contourArea(contour)) {
+//                    maxArea = Imgproc.contourArea(contour);
+//
+//                    Map<String, Double> dataTemp = new HashMap<>();
+//
+//                    for (Point p : contour.toList()) {
+//                        dataTemp.put("x", p.x);
+//                        dataTemp.put("y", p.y);
+//                    }
+//
+////                    dataTemp.put("x", contour.x);
+////                    dataTemp.put("y", contour.y);
+////                    dataTemp.put("width", contour.width());
+////                    dataTemp.put("height", contour.height());
+//
+//                    contoursFound.add(dataTemp);
+//                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("OpenCV Error: " + e.toString());
+        }
+        return contoursFound;
     }
 }

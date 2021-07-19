@@ -897,13 +897,13 @@ class ImgProc {
   /// Function takes input file's byte array data, accumulator value dp, min distance value between two circles, method specific parameters 1 & 2,
   /// min & max radius of the circles, & optional values for the circle center width, center color, circle width & circle color.
   static Future<dynamic> houghCircles(Uint8List byteData,
-      {@required int method,
-      @required double dp,
-      @required double minDist,
-      @required double param1,
-      @required double param2,
-      @required int minRadius,
-      @required int maxRadius,
+      {required int method,
+      required double dp,
+      required double minDist,
+      required double param1,
+      required double param2,
+      required int minRadius,
+      required int maxRadius,
       int centerWidth = 2,
       String centerColor = "#ff0000",
       int circleWidth = 2,
@@ -938,9 +938,9 @@ class ImgProc {
   ///   sourcePoints = [P1.x, P1.y, P2.x, P2.y, P3.x, P3.y, P4.x, P4.y]
   ///   similarly for destinationPoints as well
   static Future<dynamic> warpPerspectiveTransform(Uint8List byteData,
-      {@required List sourcePoints,
-      @required List destinationPoints,
-      @required List<double> outputSize}) async {
+      {required List sourcePoints,
+      required List destinationPoints,
+      required List<double> outputSize}) async {
     /// Variable to store operation result
     final dynamic result =
         await _channel.invokeMethod('warpPerspectiveTransform', {
@@ -954,10 +954,39 @@ class ImgProc {
     return result;
   }
 
-  static Future<dynamic> grabCut(Uint8List byteData, {int px = 0, int py = 0, int qx = 0, int qy = 0, int itercount = 1, int mode = 0}) async {
+  static Future<dynamic> grabCut(Uint8List byteData,
+      {int px = 0,
+      int py = 0,
+      int qx = 0,
+      int qy = 0,
+      int itercount = 1,
+      int mode = 0}) async {
     /// Variable to store operation result
-    final dynamic result = await _channel.invokeMethod(
-        'grabCut', {'byteData': byteData, 'px': px, 'py': py, 'qx': qx, 'qy': qy, 'itercount': itercount, 'mode': mode});
+    final dynamic result = await _channel.invokeMethod('grabCut', {
+      'byteData': byteData,
+      'px': px,
+      'py': py,
+      'qx': qx,
+      'qy': qy,
+      'itercount': itercount,
+      'mode': mode,
+    });
+
+    /// Function returns the set String as result, use for debugging
+    return result;
+  }
+
+  static Future<dynamic> findContours(
+    Uint8List byteData, {
+    required int mode,
+    required int method,
+  }) async {
+    /// Variable to store operation result
+    final dynamic result = await _channel.invokeMethod('findContours', {
+      'byteData': byteData,
+      'mode': mode,
+      'method': method,
+    });
 
     /// Function returns the set String as result, use for debugging
     return result;

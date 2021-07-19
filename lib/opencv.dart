@@ -16,9 +16,9 @@ class OpenCV {
   static const MethodChannel _channel = const MethodChannel('opencv');
 
   /// Function to check working/validity of method channels
-  static Future<String> get platformVersion async {
+  static Future<String?> get platformVersion async {
     /// String to store the version number before returning. This is just to test working/validity.
-    final String version = await _channel.invokeMethod('getPlatformVersion');
+    final String? version = await _channel.invokeMethod('getPlatformVersion');
 
     /// Function returns version number
     return version;
